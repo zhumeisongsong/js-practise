@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<p>Please enter the numbers of books you want to buy.Split each with quotes: 1,2,2... </p>
+<input type="text" id="input" title="input">
+<button id="button">SUBMIT</button>
+
+<p>The price with the biggest discount:
+  <span id="price"></span>
+</p>
+<p>The way to group:
+  <br>
+  <span id="result"></span>
+</p>
+
+<script>
+  /**
+   * Format DBC to SBC
+   *
+   * @param {String} string
+   * @return {Object} result
+   */
+  const DBC2SBC = (string) => {
+    if (string) {
+      let result = ""
+      let len = string.length
+      for (let i = 0; i < len; i++) {
+        let cCode = string.charCodeAt(i)
+        cCode = (cCode >= 0xFF01 && cCode <= 0xFF5E) ? (cCode - 65248) : cCode
+        cCode = (cCode === 0x03000) ? 0x0020 : cCode
+        result += String.fromCharCode(cCode)
+      }
+      return result
+    }
+  }
+
+  /**
+   * Get Set object size
+   *
+   * @param {Object} total
+   * @return {Number} size
+   */
+  const getMaxCombinationLength = (total) => {
+    let set = new Set(total)
+    return set.size
+  }
+
+  /**
+   *
+   * Get combination
+   *
+   * @param {Object} total
+   * @param {Object} result
+   * @param {Number} size
+   * @return {Object} result
+   */
+  const getCombination = (total, result, size) => {
+    let combination = []
+    let remain = []
+
+    total.map((val, index) => {
+      if (combination.length < size) {
+        if (val !== total[index + 1]) {
+          combination.push(val)
+        } else {
+          remain.push(val)
+        }
+      } else {
+        remain.push(val)
+      }
+    })
+
+    result.push({combination})
+
+    if (remain.length) {
+      getCombination(remain, result, size)
+    }
+
+    return result
+  }
+
+  /**
+   * Get each combination's discount
+   *
+   * @param {Object} combination
+   * @return {Number} discount
+   */
+  const getDiscount = (combination) => {
+    let discount = 0
+
+    switch (combination.length) {
+      case 2:
+        discount = 5
+        break
+      case 3:
+        discount = 10
+        break
+      case 4:
+        discount = 20
+        break
+      case 5:
+        discount = 25
+        break
+    }
+    return discount
+  }
+
+  /**
+   * Get group's total price
+   *
+   * @param {Object} group
+   * @return {Number} price
+   */
+  const getTotalPrice = (group) => {
+    let perPrice = 8
+    let totalPrice = 0
+
+    group.map((val) => {
+      totalPrice += val.combination.length * perPrice * (100 - val.discount)
+    })
+
+
+    return totalPrice / 100
+  }
+
+  /**
+   * Get the biggest discount group from groups
+   *
+   * @param {Object} groups
+   * @return {Object} result
+   */
+  const getTheLargestDiscountGroup = (groups) => {
+    let result = groups[0]
+
+    for (let i = 1; i < groups.length; i++) {
+      if (result.total > groups[i].total) {
+        result = groups[i]
+      }
+    }
+    return result
+  }
+
+  /**
+   * Output the result for display
+   *
+   * @param {Object} group
+   */
+  const outputAnswer = (group) => {
+    const price = document.getElementById('price')
+    const result = document.getElementById('result')
+    let resultText = []
+
+
+    group.result.map((val) => {
+      let items = val.combination.join(',')
+      resultText.push(`1 group of ${val.combination.length} --> ${val.discount} discount (${items})`)
+    })
+
+    price.innerHTML = group.total
+    result.innerHTML = resultText.join('<br>')
+  }
+
+  /**
+   * Get the bigest discount of books and output the price and group
+   *
+   * @param {Object} books
+   */
+  const getTheBigestDiscountAnswer = (books) => {
+    const sortedTotal = books.sort()
+    const maxCombinationLength = getMaxCombinationLength(sortedTotal)
+
+    let groups = []
+    let resultGroup = []
+
+    // Only by same book
+    if (maxCombinationLength === 1) {
+      resultGroup.result = [{
+        combination: books,
+        discount: 0
+      }]
+
+      resultGroup.total = getTotalPrice(resultGroup.result)
+      return outputAnswer(resultGroup)
+    }
+
+    // Buy more than 2 types of books
+    for (let size = maxCombinationLength; size > 1; size--) {
+      let group = {}
+      let result = getCombination(sortedTotal, [], size)
+
+      group.result = result
+
+      // Get each group discount
+      result.map((val, index) => {
+        result[index].discount = getDiscount(val.combination)
+      })
+
+      group.total = getTotalPrice(result)
+      groups.push(group)
+    }
+
+    console.log(groups)
+
+    resultGroup = getTheLargestDiscountGroup(groups)
+
+    // Out the answer of available result
+    outputAnswer(resultGroup)
+  }
+
+  const init = () => {
+
+  }
+
+  const bind = () => {
+    const button = document.getElementById('button')
+    button.addEventListener('click', function () {
+      const inputValue = document.getElementById('input').value
+
+      let books = DBC2SBC(inputValue)
+      if (!books) {
+        return alert('Please enter!')
+      }
+
+      books = books.split(',')
+      getTheBigestDiscountAnswer(books)
+
+    })
+  }
+
+  (() => {
+    init()
+    bind()
+  })()
+</script>
+
+</body>
+</html>
