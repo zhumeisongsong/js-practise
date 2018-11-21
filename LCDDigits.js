@@ -132,17 +132,12 @@ const getEachChunksDigits = (string) => {
  * @return {Object} result
  */
 const getDigits = (string, size) => {
-
-
   const formatInput = chunkString(string, size)
 
   formatInput.map((val) => {
     getEachChunksDigits(val)
     console.log('\n')
   })
-
-
-
 }
 
 getDigits('2343242342', 10)
