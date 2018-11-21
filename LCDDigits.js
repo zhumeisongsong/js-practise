@@ -58,17 +58,7 @@ const characters = {
 }
 
 /**
- * Format DBC to SBC
- *
- * @param {String} string
- * @return {Object} result
- */
-const removeQuote = (string) => {
-
-}
-
-/**
- * Format DBC to SBC
+ * Trans characters name to characters
  *
  * @param {Array} array
  * @return {String} result
@@ -86,7 +76,7 @@ const string2characters = (array) => {
 }
 
 /**
- * Format DBC to SBC
+ * Get string of each line
  *
  * @param {Array} line
  * @return {String} result
@@ -98,12 +88,11 @@ const getLineOutput = (line) => {
     result += string2characters(val)
   })
 
-  console.log(result)
   return result
 }
 
 /**
- * Format DBC to SBC
+ * Output digits result
  *
  * @param {String} string
  * @return {Object} result
@@ -117,9 +106,10 @@ const getDigits = (string) => {
       result[i].push(digitsArr[index][i + 1])
     }
     result[i] = getLineOutput(result[i])
-    // console.log(result[i])
+    console.log(result[i])
   }
+
 }
 
-getDigits('1234567890')
+getDigits('1234567890455678856')
 
