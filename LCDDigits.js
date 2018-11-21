@@ -58,6 +58,18 @@ const characters = {
 }
 
 /**
+ * Split large string into N-size chunks
+ *
+ * @param {String} string
+ * @param {Number} length
+ * @return {Array} result
+ */
+
+const chunkString = (string, length) => {
+  return string.match(new RegExp('.{1,' + length + '}', 'g'));
+}
+
+/**
  * Trans characters name to characters
  *
  * @param {Array} array
@@ -91,13 +103,14 @@ const getLineOutput = (line) => {
   return result
 }
 
+
 /**
- * Output digits result
+ * Output each chunks to digits
  *
  * @param {String} string
  * @return {Object} result
  */
-const getDigits = (string) => {
+const getEachChunksDigits = (string) => {
   let result = [[], [], []]
 
   for (let i = 0; i < 3; i++) {
@@ -108,8 +121,29 @@ const getDigits = (string) => {
     result[i] = getLineOutput(result[i])
     console.log(result[i])
   }
+}
+
+
+/**
+ * Output digits result
+ *
+ * @param {String} string
+ * @param {Number} size
+ * @return {Object} result
+ */
+const getDigits = (string, size) => {
+
+
+  const formatInput = chunkString(string, size)
+
+  formatInput.map((val) => {
+    getEachChunksDigits(val)
+    console.log('\n')
+  })
+
+
 
 }
 
-getDigits('1234567890455678856')
+getDigits('2343242342', 10)
 
